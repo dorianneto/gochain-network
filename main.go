@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"io"
 	"log"
 	"net"
@@ -48,6 +49,23 @@ func handleConnection(connection net.Conn) {
 			io.WriteString(connection, "\nEnter a new BPM:")
 		}
 	}()
+
+	go func() {
+		for {
+			time.Sleep(30 * time.Second)
+			output, err := json.Marshal(blockchain.Blockchain)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			io.WriteString(connection, string(output))
+		}
+	}()
+
+	for range blockchainServer {
+		spew.Dump(blockchain.Blockchain)
+	}
 }
 
 func main() {
